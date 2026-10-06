@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Minha Mente</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="sidebar">
+      <div>
+        <span class="eyebrow">MINHA MENTE</span>
+        <h1>Agenda</h1>
+        <p class="muted">Compromissos, tarefas e Google Calendar no mesmo lugar.</p>
+        <nav class="sidebar-nav">
+          <button class="side-nav-btn active" data-view="calendar">Calendário</button>
+          <button class="side-nav-btn" data-view="list">Lista</button>
+          <button class="side-nav-btn" data-view="tasks">Tarefas</button>
+        </nav>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="stats-card"><span>Compromissos</span><strong id="totalEvents">0</strong></div>
+        <div class="stats-card"><span>Tarefas abertas</span><strong id="openTasks">0</strong></div>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="toolbar">
+        <div><span class="eyebrow">PLANEJAMENTO</span><h2 id="pageTitle">Agenda</h2></div>
+        <div class="toolbar-actions">
+          <button id="newTaskBtn" class="secondary-btn">+ Nova tarefa</button>
+          <button id="newEventBtn" class="primary-btn">+ Novo compromisso</button>
+        </div>
+      </div>
+
+      <div class="view-switcher">
+        <button id="calendarViewBtn" class="view-btn active">Calendário</button>
+        <button id="listViewBtn" class="view-btn">Lista</button>
+        <button id="tasksViewBtn" class="view-btn">Tarefas</button>
+      </div>
+
+      <section id="calendarView" class="calendar-panel">
+        <div class="calendar-toolbar">
+          <div class="calendar-nav">
+            <button id="prevMonthBtn" class="icon-btn">‹</button>
+            <button id="todayBtn" class="secondary-btn">Hoje</button>
+            <button id="nextMonthBtn" class="icon-btn">›</button>
+          </div>
+          <h3 id="monthLabel" class="month-label"></h3>
+        </div>
+        <div class="weekdays"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
+        <div id="calendarGrid" class="calendar-grid"></div>
+      </section>
+
+      <section id="listView" class="hidden">
+        <div class="filters">
+          <input id="searchInput" type="search" placeholder="Buscar compromisso...">
+          <select id="filterPeriod">
+            <option value="all">Todos</option><option value="today">Hoje</option>
+            <option value="upcoming">Próximos</option><option value="past">Passados</option>
+          </select>
+        </div>
+        <div id="agendaList" class="agenda-list"></div>
+      </section>
+
+      <section id="tasksView" class="hidden">
+        <div class="filters">
+          <input id="taskSearchInput" type="search" placeholder="Buscar tarefa...">
+          <select id="taskFilter">
+            <option value="open">Em aberto</option><option value="today">Para hoje</option>
+            <option value="all">Todas</option><option value="completed">Concluídas</option>
+          </select>
+        </div>
+        <div id="tasksList" class="tasks-list"></div>
+      </section>
+
+      <section class="integration-card">
+        <div>
+          <span class="eyebrow">INTEGRAÇÃO</span>
+          <h3>Google Calendar</h3>
+          <p id="googleStatusText" class="muted">Verificando conexão...</p>
+        </div>
+        <div class="integration-actions">
+          <button id="googleConnectBtn" class="primary-btn">Conectar Google Agenda</button>
+          <button id="googleSyncBtn" class="secondary-btn hidden">Sincronizar agora</button>
+          <button id="googleDisconnectBtn" class="secondary-btn hidden">Desconectar</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="eventDialog">
+    <form id="eventForm" class="event-form">
+      <div class="dialog-header">
+        <div><span class="eyebrow">COMPROMISSO</span><h2 id="dialogTitle">Novo compromisso</h2></div>
+        <button type="button" id="closeDialogBtn" class="icon-btn">✕</button>
+      </div>
+      <input type="hidden" id="eventId">
+      <label>Título<input id="eventTitle" required maxlength="120" placeholder="Ex.: Reunião com cliente"></label>
+      <div class="form-grid">
+        <label>Data<input id="eventDate" type="date" required></label>
+        <label>Hora<input id="eventTime" type="time" required></label>
+      </div>
+      <div class="form-grid">
+        <label>Categoria<select id="eventCategory"><option>Pessoal</option><option>Trabalho</option><option>ANOAR</option><option>Cliente</option><option>Outro</option></select></label>
+        <label>Lembrete<select id="eventReminder"><option value="-1">Sem lembrete</option><option value="0">Na hora</option><option value="5">5 min antes</option><option value="10" selected>10 min antes</option><option value="15">15 min antes</option><option value="30">30 min antes</option><option value="60">1 hora antes</option><option value="1440">1 dia antes</option></select></label>
+      </div>
+      <div class="form-grid">
+        <label>Repetir<select id="eventRecurrence"><option value="none">Não repetir</option><option value="daily">Todos os dias</option><option value="weekly">Toda semana</option><option value="monthly">Todo mês</option></select></label>
+        <label>Repetir até<input id="eventRepeatUntil" type="date"></label>
+      </div>
+      <label>Observações<textarea id="eventNotes" rows="4" maxlength="500" placeholder="Detalhes opcionais..."></textarea></label>
+      <div class="dialog-actions">
+        <button type="button" id="deleteEventBtn" class="danger-btn hidden">Excluir</button>
+        <div><button type="button" id="cancelBtn" class="secondary-btn">Cancelar</button> <button class="primary-btn">Salvar</button></div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="taskDialog">
+    <form id="taskForm" class="event-form">
+      <div class="dialog-header">
+        <div><span class="eyebrow">TAREFA</span><h2 id="taskDialogTitle">Nova tarefa</h2></div>
+        <button type="button" id="closeTaskDialogBtn" class="icon-btn">✕</button>
+      </div>
+      <input type="hidden" id="taskId">
+      <label>Título<input id="taskTitle" required maxlength="120" placeholder="Ex.: Finalizar proposta"></label>
+      <div class="form-grid">
+        <label>Data limite<input id="taskDate" type="date"></label>
+        <label>Categoria<select id="taskCategory"><option>Pessoal</option><option>Trabalho</option><option>ANOAR</option><option>Cliente</option><option>Outro</option></select></label>
+      </div>
+      <label>Observações<textarea id="taskNotes" rows="4" maxlength="500"></textarea></label>
+      <div class="dialog-actions">
+        <button type="button" id="deleteTaskBtn" class="danger-btn hidden">Excluir</button>
+        <div><button type="button" id="cancelTaskBtn" class="secondary-btn">Cancelar</button> <button class="primary-btn">Salvar</button></div>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="google-calendar.js"></script>
+  <script src="agenda.js"></script>
+</body>
+</html>
